@@ -1,0 +1,31 @@
+package main
+
+import (
+	"log"
+	"syscall"
+)
+
+type server struct {
+	listen_fd int
+}
+
+func main() {
+	s := open_socket()
+
+}
+
+func open_socket() (s server) {
+	// opens and binds socket.
+	fd, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_STREAM, 0)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s = server{listen_fd: fd}
+	err = syscall.Bind(s.listen_fd, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return s
+}
