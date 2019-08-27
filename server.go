@@ -16,12 +16,16 @@ type server struct {
 
 func main() {
 	server := open_socket()
+	defer syscall.Close(server.listen_fd)
+
 	err := syscall.Listen(server.listen_fd, MAX_CONN)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	conn_fd, _, err := syscall.Accept(server.listen_fd)
+	defer syscall.Close(conn_fd)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,7 +37,7 @@ func main() {
 }
 
 func read_from_socket(conn_fd int) {
-	buff := make([]byte, 1024)
+	buff := make([]byte, 4096)
 	for {
 		n, err := syscall.Read(conn_fd, buff)
 		if err != nil {
