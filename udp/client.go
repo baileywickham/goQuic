@@ -7,10 +7,6 @@ import "time"
 
 const bufSize = 1024
 
-func main() {
-
-}
-
 func client(ctx context.Context, address string, reader io.Reader) error {
 	addr, err := net.ResolveUDPAddr("udp", address)
 	if err != nil {
