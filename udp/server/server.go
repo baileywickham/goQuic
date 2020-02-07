@@ -13,14 +13,20 @@ type pktHeader struct {
 	checksum int16
 }
 
-func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	server(ctx, "localhost:2000")
-	defer cancel()
-
+type Client struct {
+	addr string
+}
+type server struct {
+	numConnectedClients int
+	Clients             []Client
 }
 
-func server(ctx context.Context, address string) error {
+func (s *server) addClient(c Client) {
+	s.Clients = append(s.Clients, c)
+	s.numConnectedClients++
+}
+
+func serve(ctx context.Context, address string) error {
 	pc, err := net.ListenPacket("udp", address)
 	if err != nil {
 		panic(err)
@@ -46,6 +52,7 @@ func read_from_udp(doneChan chan error, pc net.PacketConn) {
 			doneChan <- err
 		}
 		println("Read: ", n, addr.String())
+		println("PACKET: ", string(buf))
 	}
 
 }
@@ -56,4 +63,11 @@ func checksum(buf []byte) int16 {
 		chk += int16(b)
 	}
 	return chk
+}
+
+func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	serve(ctx, "localhost:8000")
+	defer cancel()
+
 }
