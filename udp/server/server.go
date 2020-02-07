@@ -45,8 +45,8 @@ func serve(ctx context.Context, address string) error {
 }
 
 func read_from_udp(doneChan chan error, pc net.PacketConn) {
-	buf := make([]byte, bufSize)
 	for {
+		buf := make([]byte, bufSize)
 		n, addr, err := pc.ReadFrom(buf)
 		if err != nil {
 			doneChan <- err

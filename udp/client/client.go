@@ -49,7 +49,7 @@ func Runner(conn *net.UDPConn, doneChan chan error) {
 		case "w":
 			// defualt size of 64
 			var buf []byte
-			for _, str := range tokens {
+			for _, str := range tokens[1:] {
 				// no idea how this works
 				buf = append(buf, []byte(str)...)
 			}
