@@ -6,7 +6,7 @@ import (
 	"syscall"
 )
 
-const PORTNUM = 2000
+const PORTNUM = 8000
 const MAX_CONN = 3
 
 type server struct {

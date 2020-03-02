@@ -1,28 +1,38 @@
 package main
 
 import (
+	"bufio"
 	"context"
+	"encoding/gob"
+	"fmt"
+	"log"
 	"net"
 )
 
 const bufSize = 1024
+const headerSize = 9 // odd size?
 
 type pktHeader struct {
-	version  int8
-	length   int16
-	payload  int16
-	checksum int16
+	version  uint8
+	length   uint16
+	cmd      uint8
+	checksum uint32
 }
 
 func serve(ctx context.Context, address string) error {
-	pc, err := net.ListenPacket("udp", address)
+
+	udpAddr, err := net.ResolveUDPAddr("udp", address)
 	if err != nil {
 		panic(err)
 	}
-	defer pc.Close()
+	conn, err := net.ListenUDP("udp", udpAddr)
+	if err != nil {
+		panic(err)
+	}
+	defer conn.Close()
 
 	doneChan := make(chan error, 1)
-	go read_from_udp(doneChan, pc)
+	go read_from_udp(doneChan, conn)
 
 	select {
 	case <-ctx.Done():
@@ -32,25 +42,22 @@ func serve(ctx context.Context, address string) error {
 	return nil
 }
 
-func read_from_udp(doneChan chan error, pc net.PacketConn) {
+func read_from_udp(doneChan chan error, conn *net.UDPConn) {
+	dec := gob.NewDecoder(conn)
+
 	for {
-		buf := make([]byte, bufSize)
-		n, addr, err := pc.ReadFrom(buf)
+		var header pktHeader
+		err := dec.Decode(header)
 		if err != nil {
-			doneChan <- err
+			println("WARN: packet dropped")
 		}
-		println("Read: ", n, addr.String())
-		println("PACKET: ", string(buf))
+
 	}
 
 }
 
-func checksum(buf []byte) int16 {
-	chk := int16(0)
-	for _, b := range buf {
-		chk += int16(b)
-	}
-	return chk
+func read_into_header(buf [headerSize]byte) {
+
 }
 
 func main() {
