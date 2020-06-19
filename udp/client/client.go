@@ -5,6 +5,7 @@ import "context"
 import "net"
 import "os"
 import "strings"
+import r "github.com/baileywickham/runner"
 
 const bufSize = 1024
 
@@ -31,6 +32,11 @@ func client(ctx context.Context, address string) error {
 	}
 
 	return nil
+
+}
+
+func writeText(text string) {
+	conn.Write(text)
 
 }
 

@@ -1,1 +1,1 @@
-echo test | netcat -u localhost 2000
+echo test | netcat -u localhost 8000
